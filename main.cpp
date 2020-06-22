@@ -6,6 +6,7 @@
 #include <map>
 #include <algorithm>
 #include <fstream>
+#include <numeric>
 #include <cstdlib>
 #include <windows.h>
 
@@ -60,6 +61,18 @@ std::string resultToString(const std::chrono::duration<double>& result) {
     return m + ':' + s + ':' + ms;
 }
 
+double avg(const int& mode, const int& n) {
+    std::vector<std::chrono::duration<double>> tempVec = results[mode];
+    std::reverse(tempVec.begin(), tempVec.end());
+
+    double sum = 0;
+
+    for(size_t i = 0; i < n; ++i)
+        sum +=tempVec[i].count();
+
+    return sum / n;
+}
+
 void timer(const int& mode) {
     system("cls");
 
@@ -83,11 +96,13 @@ void timer(const int& mode) {
         std::cout << " Press space to end...\n";
     }
 
+    results[mode].emplace_back(timeSplit);
+
     std::cout << " === Rubik's Cube Timer === \n\n";
     std::cout << " ======== " << resultToString(timeSplit) << " ======== \n\n";
     std::cout << " Best:  " << resultToString(*std::min_element(results[mode].begin(), results[mode].end())) << "\n";
-    std::cout << " Avg5:  " << "\n";
-    std::cout << " Avg12: " << "\n";
+    std::cout << " Avg5:  " << resultToString(std::chrono::duration<double>(avg(mode, 5))) << "\n";
+    std::cout << " Avg12: " << resultToString(std::chrono::duration<double>(avg(mode, 12))) << "\n";
 }
 
 void loadResults() {
